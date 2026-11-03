@@ -150,7 +150,6 @@ def scan_alternative_crops(api_url, area, candidate_items, current_item, year, r
                 pred_raw = str(data.get("predicted_label", "")).strip().lower()
                 probs = data.get("probabilities", {})
                 
-                # Tìm xác suất mức Cao và Trung bình
                 high_prob = 0.0
                 med_prob = 0.0
                 for k, v in probs.items():
@@ -267,7 +266,6 @@ with tab_predict:
                 predicted_label = result.get("predicted_label", "").lower()
                 probabilities = result.get("probabilities", {})
                 
-                # Chuẩn hóa nhãn dự báo
                 p_lower = str(predicted_label).strip().lower()
                 is_low = p_lower in ["low", "0", "thấp"]
                 is_medium = p_lower in ["medium", "1", "trung bình"]
@@ -292,7 +290,6 @@ with tab_predict:
                 with col3:
                     st.metric(label="📊 Cấp độ năng suất", value=predicted_label_vi)
                 
-                # Tính toán ước tính sản lượng & doanh thu dựa trên dữ liệu lịch sử
                 base_hg_ha = 150000.0
                 if df_raw is not None and 'hg/ha_yield' in df_raw.columns:
                     df_sub = df_raw[(df_raw['Area'] == selected_area) & (df_raw['Item'] == selected_item)]
@@ -303,7 +300,6 @@ with tab_predict:
                         if not df_item_only.empty:
                             base_hg_ha = float(df_item_only['hg/ha_yield'].mean())
                 
-                # Quy đổi: 1 hg/ha = 0.1 kg/ha = 0.0001 tấn/ha (chia 10,000)
                 est_ton_per_ha = (base_hg_ha / 10000.0) * yield_multiplier
                 est_total_tons = est_ton_per_ha * farm_area_ha
                 est_revenue_million = (est_total_tons * 1000.0 * crop_price_vnd) / 1_000_000.0
@@ -394,7 +390,6 @@ with tab_predict:
                       * **Định hướng kinh tế địa phương:** Khuyến nghị nhân rộng mô hình canh tác này cho các hộ dân lân cận, đồng thời xây dựng chuỗi liên kết tiêu thụ nông sản sạch đạt chuẩn để nâng cao giá trị thương phẩm.
                     """)
                 
-                # Nếu năng suất Thấp hoặc Trung bình -> Tự động quét AI tìm cây trồng thay thế tốt hơn
                 if is_low or is_medium:
                     st.markdown(f"#### 🔄 Đề xuất Chuyển đổi Cơ cấu Cây trồng Thông minh tại `{selected_area}`")
                     with st.spinner("Đang quét mô hình AI trên toàn bộ danh mục cây trồng để tìm giống thay thế tối ưu..."):
@@ -440,12 +435,12 @@ with tab_predict:
                     file_name=f"Bao_cao_{selected_area}_{selected_item}_{year}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-                    
+                
             else:
                 st.error(f"Lỗi từ máy chủ FastAPI (Mã: {response.status_code})")
                 
         except Exception as e:
-            st.error(f"❌ Không thể kết nối tới Server FastAPI tại `{api_url}`.\nHãy chắc chắn rằng cửa sổ dòng lệnh chạy uvicorn vẫn đang mở!\n\nChi tiết lỗi: {e}")
+            st.error(f"❌ Không thể kết nối tới Server FastAPI tại `{api_url}`.\nHãy chắc chắn rằng dịch vụ trên Render đang hoạt động!\n\nChi tiết lỗi: {e}")
 
     else:
         st.info("👈 Hãy chọn Khu vực, bấm **'Tự động lấy thời tiết khu vực'** (hoặc tự chỉnh thông số) rồi nhấn **'Dự báo Năng suất ngay'**.")

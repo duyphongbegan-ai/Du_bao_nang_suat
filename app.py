@@ -247,7 +247,7 @@ tab_predict, tab_eda, tab_history, tab_info = st.tabs([
 
 with tab_predict:
     if predict_btn:
-        api_url = "http://localhost:8000/predict"
+        api_url = " https://api-nong-nghiep.onrender.com"
         
         payload = {
             "Area": selected_area,
